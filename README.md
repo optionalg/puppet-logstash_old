@@ -1,4 +1,22 @@
 puppet-logstash
-===============
+====================
 
-A Puppet module for managing logstash. There are a fair number of logstash modules already in existence, so this one is mostly for my own learning as opposed to competition for one of the others (which are far better than this one, anyway).
+A module to install and configure logstash.
+
+This is for Debian/Ubuntu.
+
+###Usage
+
+Download the latest monolithic .jar file from [Logstash's website](http://logstash.net/). Place it in the `files/` folder of the module and rename it to `logstash.jar`.
+
+In the **Variables** section at the top of `init.pp`, you can specify values for several things but the only one you should really check is the location of your machine's Java runtime binary (usually at `/usr/bin/java`). 
+
+In your `site.pp`, apply the `logstash` class to a node:
+
+<pre>
+node 'logstash-server' {
+    include logstash
+}
+</pre>
+
+Yes, I will expose turn this into a parameterized class later on.
