@@ -94,8 +94,15 @@ class logstash {
     #so it restarts automatically when changes to the .conf file are made.
     service { 'logstash':
         ensure => running,
+        start => "/etc/init.d/logstash start",
+        stop => "/etc/init.d/logstash stop",
+        restart => "/etc/init.d/logstash restart",
+        status => "/etc/init.d/logstash status",
+        hasstatus => true,
+        hasrestart => true,
+        provider => "base",
         subscribe => File['config-file'],
-        require => [File['config-file'], File['log-file'], File['logstash-init-script'], File['logstash-monolithic-jar-file'], Package['openjdk-7-jre-headless']],
+        require => [File['log-file'], File['logstash-init-script'], File['logstash-monolithic-jar-file'], Package['openjdk-7-jre-headless']],
     }
     
 }
