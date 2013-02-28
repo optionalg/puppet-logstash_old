@@ -1,3 +1,26 @@
+# == Class: logstash
+#
+# This base class installs and configures Logstash.
+# Multicast networking is used (it's ElasticSearch's default).
+#
+# === Parameters
+# 
+#
+#
+#
+#
+#
+#
+#
+# === Examples
+# 
+#
+#
+#
+#
+#
+#
+#
 class logstash {
 
     #Variables (will turn these into parameters later on)
@@ -66,8 +89,10 @@ class logstash {
 	}
     
     #Service resources
+    
+    #Logstash itself. Require the files above and subscribe it to the config file
+    #so it restarts automatically when changes to the .conf file are made.
     service { 'logstash':
-        enable => true,
         ensure => running,
         subscribe => File['config-file'],
         require => [File['config-file'], File['log-file'], File['logstash-init-script'], File['logstash-monolithic-jar-file'], Package['openjdk-7-jre-headless']],
