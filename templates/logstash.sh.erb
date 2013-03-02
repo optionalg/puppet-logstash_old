@@ -1,66 +1,116 @@
 #! /bin/sh
- 
 ### BEGIN INIT INFO
-# Provides:          logstash
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start daemon at boot time
-# Description:       Enable service provided by daemon.
+# Provides: logstash
+# Required-Start: $local_fs $remote_fs
+# Required-Stop: $local_fs $remote_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: S 0 1 6
+# Short-Description: Logstash
+# Description: Starts Logstash as a daemon.
+# Author: christian.paredes@sbri.org
 ### END INIT INFO
  
+# Amount of memory for Java
+JAVAMEM=256M
+ 
+# User to run logstash server as
+LOGSTASH_USER=root
+LOGSTASH_GROUP=root
+
+#logstash_conf="<%= config_file_path %>"
+#logstash_log="<%= logstash_log_path %>"
+#logstash_bin="<%= java_runtime_path %> -- -jar <%= jar_file_path %>"
+ 
+# Location of logstash files
+#LOCATION=/opt/logstash
+ 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+DESC="Logstash Daemon"
+NAME=java
+DAEMON=<%= java_runtime_path %>
+CONFIG_FILE="<%= config_file_path %>"
+LOGFILE="<%= logstash_log_path %>"
+PATTERNSPATH="/opt/logstash/patterns"
+ARGS="-Xmx$JAVAMEM -Xms$JAVAMEM -jar <%= jar_file_path %> agent --config ${CONFIG_FILE} --log ${LOGFILE}"
+SCRIPTNAME=/etc/init.d/logstash
+PID="/var/run/logstash-agent.pid"
+ 
+# Exit if the package is not installed
+if [ ! -x "$DAEMON" ]; then
+{
+  echo "Couldn't find $DAEMON"
+  exit 99
+}
+fi
+ 
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
  
-name="logstash"
-logstash_conf="<%= config_file_path %>"
-logstash_log="<%= logstash_log_path %>"
-logstash_bin="<%= java_runtime_path %> -- -jar <%= jar_file_path %>"
-pid_file="/var/run/$name.pid"
-cwd=`pwd`
- 
-start () {
-        command="${logstash_bin} agent -f $logstash_conf --log $logstash_log"
- 
-        log_daemon_msg "Starting $name"
-        if start-stop-daemon --start --quiet --oknodo -d /opt/ --pidfile "$pid_file" -b -m -N 19 --exec $command; then
-                log_end_msg 0
-        else
-                log_end_msg 1
-        fi
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+  start-stop-daemon --start --make-pidfile --pidfile $PID --quiet --background --chuid $LOGSTASH_USER:$LOGSTASH_GROUP --exec $DAEMON -- $ARGS \
+  || return 2
 }
  
-stop () {
-        start-stop-daemon --stop --quiet --oknodo --pidfile "$pid_file"
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+  # Return
+  # 0 if daemon has been stopped
+  # 1 if daemon was already stopped
+  # 2 if daemon could not be stopped
+  # other if a failure occurred
+  start-stop-daemon --stop --pidfile $PID --quiet --oknodo
+  RETVAL="$?"
+  rm -f $PID
+  return "$RETVAL"
 }
  
-status () {
-        status_of_proc -p $pid_file "" "$name"
-}
- 
-case $1 in
-        start)
-                if status; then exit 0; fi
-                start
-                ;;
-        stop)
-                stop
-                ;;
-        reload)
-                stop
-                start
-                ;;
-        restart)
-                stop
-                start
-                ;;
-        status)
-                status && exit 0 || exit $?
-                ;;
-        *)
-                echo "Usage: $0 {start|stop|restart|reload|status}"
-                exit 1
-                ;;
+case "$1" in
+  start)
+    log_daemon_msg "Starting $DESC"
+    do_start
+    case "$?" in
+      0|1) log_end_msg 0 ;;
+      2) log_end_msg 1 ;;
+    esac
+    ;;
+  stop)
+    log_daemon_msg "Stopping $DESC"
+    do_stop
+    case "$?" in
+      0|1) log_end_msg 0 ;;
+      2) log_end_msg 1 ;;
+    esac
+    ;;
+  restart)
+    log_daemon_msg "Restarting $DESC"
+    do_stop
+    case "$?" in
+      0|1)
+        do_start
+        case "$?" in
+          0) log_end_msg 0 ;;
+          1) log_end_msg 1 ;; # Old process is still running
+          *) log_end_msg 1 ;; # Failed to start
+        esac
+        ;;
+      *)
+        # Failed to stop
+        log_end_msg 1
+        ;;
+    esac
+    ;;
+  *)
+    echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
+    exit 3
+    ;;
 esac
  
 exit 0
