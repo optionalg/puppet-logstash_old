@@ -21,15 +21,13 @@
 #
 #
 #
-class logstash {
-
-    #Variables (will turn these into parameters later on)
-    $config_file_path = '/etc/logstash/central.conf'
-    $logstash_log_path = '/var/log/logstash/logstash.log'
-    $java_runtime_path = '/usr/bin/java'
-    $jar_file_path = '/opt/logstash/logstash.jar'
-    
-    
+class logstash (
+  $config_file_path = '/etc/logstash/central.conf',
+  $logstash_log_path = '/var/log/logstash/logstash.log',
+  $java_runtime_path = '/usr/bin/java',
+  $jar_file_path = '/opt/logstash/logstash.jar'
+) {
+        
     #File resources
     
     #The init script itself
@@ -94,13 +92,13 @@ class logstash {
     #so it restarts automatically when changes to the .conf file are made.
     service { 'logstash':
         ensure => running,
-        start => "/etc/init.d/logstash start",
-        stop => "/etc/init.d/logstash stop",
-        restart => "/etc/init.d/logstash restart",
-        status => "/etc/init.d/logstash status",
-        hasstatus => true,
-        hasrestart => true,
-        provider => "base",
+        #start => "/etc/init.d/logstash start",
+        #stop => "/etc/init.d/logstash stop",
+        #restart => "/etc/init.d/logstash restart",
+        #status => "/etc/init.d/logstash status",
+        #hasstatus => true,
+        #hasrestart => true,
+        provider => "init",
         subscribe => File['config-file'],
         require => [File['log-file'], File['logstash-init-script'], File['logstash-monolithic-jar-file'], Package['openjdk-7-jre-headless']],
     }
