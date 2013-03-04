@@ -44,9 +44,7 @@ node 'logstash-server' {
 }
 </pre> 
 
-
 ###Contributions
-
 
 * [rtd](https://github.com/rtd) for their init.d script, which I modified: [https://gist.github.com/rtd/1121786](https://gist.github.com/rtd/1121786)
 
