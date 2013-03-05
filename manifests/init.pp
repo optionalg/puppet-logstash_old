@@ -60,7 +60,7 @@ class logstash (
       mode => 755,
     }
     
-    file { 'config-file':
+    file { 'static-config-file':
       path => $static_config_file_path,
       ensure => file,
       mode => 644,
@@ -70,7 +70,7 @@ class logstash (
     #A conf.d style folder to hold multiple config files
     file { 'config_folder_path':
         path => $confd_path,
-        ensure => directory
+        ensure => directory,
         mode => 644,    
     }
     
@@ -107,7 +107,7 @@ class logstash (
         #hasstatus => true,
         #hasrestart => true,
         provider => "init",
-        subscribe => File['config-file'],
+        subscribe => File['static-config-file'],
         require => [File['log-file'], File['logstash-init-script'], File['logstash-monolithic-jar-file'], Package['openjdk-7-jre-headless']],
     }
     

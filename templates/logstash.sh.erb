@@ -17,7 +17,7 @@ JAVAMEM=256M
 LOGSTASH_USER=root
 LOGSTASH_GROUP=root
 
-#logstash_conf="<%= config_file_path %>"
+#logstash_conf="<%= static_config_file_path %>"
 #logstash_log="<%= logstash_log_path %>"
 #logstash_bin="<%= java_runtime_path %> -- -jar <%= jar_file_path %>"
  
@@ -28,7 +28,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 DESC="Logstash Daemon"
 NAME=java
 DAEMON=<%= java_runtime_path %>
-CONFIG_FILE="<%= config_file_path %>"
+CONFIG_FILE="<%= static_config_file_path %>"
 LOGFILE="<%= logstash_log_path %>"
 PATTERNSPATH="/opt/logstash/patterns"
 ARGS="-Xmx$JAVAMEM -Xms$JAVAMEM -jar <%= jar_file_path %> agent --config ${CONFIG_FILE} --log ${LOGFILE}"
