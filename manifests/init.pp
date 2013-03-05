@@ -1,7 +1,7 @@
 # == Class: logstash
 #
 # This base class installs and configures Logstash.
-# Multicast networking is used (it's ElasticSearch's default).
+# 
 #
 # === Parameters
 # 
