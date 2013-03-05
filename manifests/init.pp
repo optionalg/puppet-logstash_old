@@ -22,7 +22,8 @@
 #
 #
 class logstash (
-  $config_file_path = '/etc/logstash/central.conf',
+  $static_config_file_path = '/etc/logstash/central.conf',
+  $confd_path = '/etc/logstash/conf.d/',
   $logstash_log_path = '/var/log/logstash/logstash.log',
   $java_runtime_path = '/usr/bin/java',
   $jar_file_path = '/opt/logstash/logstash.jar'
@@ -60,10 +61,17 @@ class logstash (
     }
     
     file { 'config-file':
-      path => $config_file_path,
+      path => $static_config_file_path,
       ensure => file,
       mode => 644,
       source => 'puppet:///modules/logstash/central.conf',
+    }
+    
+    #A conf.d style folder to hold multiple config files
+    file { 'config_folder_path':
+        path => $confd_path,
+        ensure => directory
+        mode => 644,    
     }
     
     #Where Logstash's own logs will be kept (creating the directory first because it probably won't exist yet)

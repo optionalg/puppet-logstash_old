@@ -1,4 +1,4 @@
-# == Class: logstash
+# == Class: logstash::fragments
 #
 # This base class installs and configures Logstash's shipper.conf.
 # 
@@ -22,29 +22,29 @@
 #
 #
 
-class logstash::fragments { 
+class logstash::config_fragments { 
 
 
 
        include concat::setup
-       $motdfile = ""
+       
 
-       concat{$file:
+       concat{$conf_file:
                owner => root,
                group => root,
                mode => 644
        }
 
-       concat::fragment{"":
+       concat::fragment{"input_container":
                target => $file,
                content => "",
-               order => 10,
+               order => 1,
        }
 
        concat::fragment{"":
                target => $file,
                content => "\n\n",
-               order => 90,
+               order => 10000,
        }
 }
 
