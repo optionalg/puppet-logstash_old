@@ -24,43 +24,30 @@
 
 class logstash::config_fragments { 
 
+    include concat::setup
+    $conf_file_name = 'central.conf'
+    
+    #The file the fragments are getting placed into
+    concat{"$logstash::confd_path/$conf_file_name":
+        owner => root,
+        group => root,
+        mode => 644,
+    }
 
-
-       include concat::setup
-       
-
-       concat{$conf_file:
-               owner => root,
-               group => root,
-               mode => 644
-       }
-
-       concat::fragment{"input_container":
-               target => $file,
-               content => "",
-               order => 1,
-       }
-
-       concat::fragment{"":
-               target => $file,
-               content => "\n\n",
-               order => 10000,
-       }
 }
 
 # defined types for the actual config
-define motd::register($content="", $order=20) {
-   if $content == "" {
-      $body = $name
-   } else {
-      $body = $content
-   }
+define logstash::config_fragments::add( 
+    $order=20,
+    $ 
+    $option = "",
+    $value = "",
+) {
 
    concat::fragment{"motd_fragment_$name":
       target  => "/etc/motd.tail",
-      content => "$body ",
+      content => "$option => value",
       order => $order
    }
-}
 
 }
