@@ -1,31 +1,41 @@
 # == Class: logstash
 #
-# This base class installs and configures Logstash.
-# 
+# This base class installs and configures Logstash and runs it as a service.
 #
 # === Parameters
-# 
 #
+# [*config_file_path*]
+#   The path for the `.conf` file Logstash wil load. Defaults to `/etc/logstash/central.conf`.
 #
+# [*logstash_log_path*]
+#   The path for the logfile that Logstash will log its own events to. Defaults to `/var/log/logstash/logstash.log`.
 #
+# [*java_runtime_path*]
+#   The path to the Java runtime binary. Defaults to `/usr/bin/java`
 #
+# [*jar_file_path*]
+#   The path where the Logstash monolithic .jar file will be placed and run from. Defaults to `/opt/logstash/logstash.jar`.
 #
-#
+# [*logstash_version*]
+#  The version of Logstash you want to download and install.
 #
 # === Examples
 # 
-#
-#
-#
-#
-#
+#   class {'logstash':
+#     config_file_path   => '/etc/logstash/central.conf',
+#     logstash_log_path  => '/var/log/logstash/logstash.log',
+#     java_runtime_path  => '/usr/bin/java',
+#     jar_file_path      => '/opt/logstash/logstash.jar'
+#     logstash_version   => '1.1.9',
+# }
 #
 #
 class logstash (
   $config_file_path = '/etc/logstash/central.conf',
   $logstash_log_path = '/var/log/logstash/logstash.log',
   $java_runtime_path = '/usr/bin/java',
-  $jar_file_path = '/opt/logstash/logstash.jar'
+  $jar_file_path = '/opt/logstash/logstash.jar',
+  $logstash_version = '1.1.9'
 ) {
         
     #File resources
@@ -45,12 +55,19 @@ class logstash (
         mode => 755,
     }
     
+    exec { 'download-logstash':
+      cwd => '/opt/logstash',
+      path => '/usr/bin',
+      command => "wget https://logstash.objects.dreamhost.com/release/logstash-${logstash_version}-monolithic.jar -O /opt/logstash/logstash-${logstash_version}-monolithic.jar",
+      creates => "/opt/logstash/logstash-${logstash_version}-monolithic.jar",
+      require => File['/opt/logstash'],
+    }
    
     file { 'logstash-monolithic-jar-file': 
       path => $jar_file_path,
       ensure => file,
       mode => 644,
-      source => 'puppet:///modules/logstash/logstash.jar',
+      #source => 'puppet:///modules/logstash/logstash.jar',
     }
     
     #Logstash's .conf file that sets up inputs, filters and outputs (and its containing folder)
