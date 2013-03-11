@@ -28,7 +28,7 @@ This module exposes the following parameters. Specifying these isn't absolutely 
 * `logstash_log_path`: The path for the logfile that Logstash will log its own events to. Defaults to `/var/log/logstash/logstash.log`.
 * `java_runtime_path`: The path to the Java runtime binary. Defaults to `/usr/bin/java`
 * `jar_file_path`: The path where the Logstash monolithic .jar file will be placed and run from. Defaults to `/opt/logstash/logstash.jar`.
-* `logstash_version`: The version of Logstash you want to download and install.
+* `logstash_version`: The version of Logstash you want to download and install. Defaults to **1.1.9**, the current version as of early March 2013.
 
 If you wanted to change the parameters, a node definition with the parameterized class would look like this:
 
@@ -39,7 +39,8 @@ node 'logstash-server' {
     config_file_path   => '/etc/logstash/central.conf',
     logstash_log_path  => '/var/log/logstash/logstash.log',
     java_runtime_path  => '/usr/bin/java',
-    jar_file_path      => '/opt/logstash/logstash.jar'
+    jar_file_path      => '/opt/logstash/logstash.jar',
+    logstash_version   => '1.1.9'
   }
 
 }
